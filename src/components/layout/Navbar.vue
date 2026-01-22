@@ -142,33 +142,47 @@ const isDark = computed(() =>
   Object.values(themePairs).includes(currentTheme.value)
 )
 
+/* APPLY WITHOUT MUTATING BASE THEME */
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem('theme', theme)
   currentTheme.value = theme
-
-  baseTheme.value =
-    reversePairs[theme] ||
-    themePairs[theme] ||
-    theme
 }
 
+/* TOGGLE ONLY SWITCHES VARIANT */
 function toggleDark() {
+  const base = baseTheme.value
+
   if (isDark.value) {
-    applyTheme(reversePairs[currentTheme.value] || baseTheme.value)
+    // go back to base light theme
+    applyTheme(base)
   } else {
-    applyTheme(themePairs[baseTheme.value] || 'dark')
+    // go to paired dark theme
+    applyTheme(themePairs[base] || 'dark')
   }
 }
 
+/* USER PICKS A NEW BASE THEME */
 function setTheme(theme) {
   baseTheme.value = theme
-  applyTheme(isDark.value ? themePairs[theme] || theme : theme)
+
+  // If currently dark, apply dark variant of new theme
+  if (isDark.value) {
+    applyTheme(themePairs[theme] || theme)
+  } else {
+    applyTheme(theme)
+  }
 }
 
 onMounted(() => {
   const saved = localStorage.getItem('theme') || 'light'
+
+  // Restore both current + base theme properly
+  currentTheme.value = saved
+  baseTheme.value =
+    reversePairs[saved] ||
+    saved
+
   applyTheme(saved)
 })
 </script>
-
