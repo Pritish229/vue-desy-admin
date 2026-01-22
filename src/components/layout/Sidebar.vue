@@ -1,30 +1,24 @@
 <template>
-
     <aside class="bg-base-100 min-h-screen transition-all duration-200 border-r border-slate-200"
         :class="collapsed ? 'w-16' : 'w-56'">
 
-        <!-- Header / Admin Branding -->
-        <div class="flex items-center gap-2 p-3 ">
-
-            <!-- Admin Icon -->
+        <!-- Header / Branding -->
+        <div class="flex items-center gap-2 p-3">
             <div class="w-8 h-8 rounded-lg bg-primary text-primary-content flex items-center justify-center">
                 <Shield class="w-4 h-4" />
             </div>
 
-            <!-- Title -->
             <span v-if="!collapsed" class="font-bold tracking-wide">
                 Admin
             </span>
-
         </div>
-
 
         <!-- Menu -->
         <nav class="p-2 space-y-1">
 
-            <div v-for="item in menuItems" :key="item.fullPath">
+            <div v-for="item in menuItems" :key="item.fullPath" class="relative group">
 
-                <!-- PARENT -->
+                <!-- PARENT BUTTON -->
                 <button class="btn btn-sm w-full justify-between"
                     :class="isParentActive(item) ? 'btn-primary' : 'btn-ghost'" @click="toggle(item)">
                     <div class="flex items-center gap-2">
@@ -32,13 +26,13 @@
                         <span v-if="!collapsed">{{ item.label }}</span>
                     </div>
 
-                    <!-- CHEVRON -->
+                    <!-- CHEVRON (expanded only) -->
                     <ChevronDown v-if="item.children?.length && !collapsed"
                         class="w-4 h-4 transition-transform duration-200"
                         :class="isOpen(item.fullPath) ? 'rotate-180' : ''" />
                 </button>
 
-                <!-- CHILDREN -->
+                <!-- CHILDREN (EXPANDED MODE) -->
                 <transition enter-active-class="transition-all duration-200 ease-out"
                     enter-from-class="opacity-0 max-h-0" enter-to-class="opacity-100 max-h-40"
                     leave-active-class="transition-all duration-150 ease-in" leave-from-class="opacity-100 max-h-40"
@@ -51,17 +45,37 @@
                     </div>
                 </transition>
 
+                <!-- CHILDREN (COLLAPSED MODE - PAGES STYLE HOVER CARD) -->
+                <div v-if="collapsed && item.children?.length && isParentActive(item)"
+                    class="absolute left-16 top-1/2 -translate-y-1/2 z-[9999]">
+                    <div class="bg-base-100 shadow-2xl rounded-xl p-3 min-w-[220px]
+           border border-base-300
+           transition-all duration-200 ease-out">
+                        <!-- Header -->
+                        <div class="font-semibold text-sm mb-2 px-2">
+                            {{ item.label }}
+                        </div>
+
+                        <!-- Links -->
+                        <div class="space-y-1">
+                            <RouterLink v-for="child in item.children" :key="child.fullPath" :to="child.fullPath"
+                                class="btn btn-xs w-full justify-start" :class="isChildActive(child.fullPath)">
+                                {{ child.label }}
+                            </RouterLink>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </nav>
-
 
     </aside>
 </template>
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import {
     LayoutDashboard,
     Users,
@@ -82,12 +96,14 @@ const route = useRoute()
 
 const openParents = ref({})
 
+/* ICON MAP */
 const icons = {
     LayoutDashboard,
     Users,
     Settings
 }
 
+/* BUILD MENU FROM ROUTER */
 const menuItems = computed(() => {
     const root = router.options.routes.find(r => r.path === '/')
     if (!root?.children) return []
@@ -107,22 +123,16 @@ const menuItems = computed(() => {
         }))
 })
 
+/* STATE HELPERS */
 function isOpen(path) {
     return openParents.value[path]
 }
 
-function toggle(item) {
-    if (!item.children?.length) {
-        router.push(item.fullPath)
-        return
-    }
-
-    openParents.value[item.fullPath] = !openParents.value[item.fullPath]
-}
-
 function isParentActive(item) {
-    return route.path === item.fullPath ||
+    return (
+        route.path === item.fullPath ||
         route.path.startsWith(item.fullPath + '/')
+    )
 }
 
 function isChildActive(path) {
@@ -131,14 +141,24 @@ function isChildActive(path) {
         : 'btn-ghost'
 }
 
-/* AUTO OPEN WHEN ROUTE CHANGES */
+/* CLICK BEHAVIOR */
+function toggle(item) {
+    if (!item.children?.length) {
+        router.push(item.fullPath)
+        return
+    }
+
+    openParents.value[item.fullPath] =
+        !openParents.value[item.fullPath]
+}
+
+/* ACCORDION MODE: AUTO OPEN ACTIVE, CLOSE OTHERS */
 watch(
     () => route.path,
     () => {
         const newState = {}
 
         menuItems.value.forEach(item => {
-            // Open only the active parent
             if (
                 route.path === item.fullPath ||
                 route.path.startsWith(item.fullPath + '/')
