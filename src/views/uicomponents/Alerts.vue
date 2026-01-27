@@ -1,5 +1,5 @@
 <template>
-    <div class="p-6 space-y-8">
+    <div class=" space-y-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             <!-- CARD 1 — NORMAL + SOFT ALERTS -->
