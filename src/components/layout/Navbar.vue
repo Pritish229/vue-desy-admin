@@ -11,9 +11,16 @@
         <Menu class="w-5 h-5" />
       </label>
 
-      <div class="hidden md:flex">
-        <input type="text" placeholder="Search..." class="input input-bordered input-sm w-48" />
+      <div class="hidden md:flex items-center gap-2">
+        <input id="searchBox" type="text" placeholder="Search..." class="input input-bordered input-sm w-48" />
+
+        <div class="flex items-center gap-1">
+          <kbd class="kbd kbd-sm">Ctrl</kbd>
+          <kbd class="kbd kbd-sm">K</kbd>
+        </div>
       </div>
+
+
     </div>
 
     <div class="ml-auto"></div>
@@ -132,5 +139,12 @@ function setTheme(theme) {
 onMounted(() => {
   const saved = localStorage.getItem('theme') || 'light'
   applyTheme(saved)
+})
+
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.key.toLowerCase() === "k") {
+    e.preventDefault()
+    document.getElementById("searchBox").focus()
+  }
 })
 </script>
