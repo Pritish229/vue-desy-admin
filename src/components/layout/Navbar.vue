@@ -3,28 +3,16 @@
 
     <!-- Left -->
     <div class="flex items-center gap-2">
-      <!-- Desktop Toggle -->
-      <button
-        class="btn btn-ghost btn-circle hidden lg:flex"
-        @click="$emit('toggle-sidebar')"
-      >
-        <Menu class="w-5 h-5" />
+      <button class="btn btn-ghost btn-circle hidden lg:flex" @click="$emit('toggle-sidebar')">
+        <ChevronLeft class="w-5 h-5" />
       </button>
 
-      <!-- Mobile Toggle (Drawer) -->
-      <label
-        for="admin-drawer"
-        class="btn btn-ghost btn-circle lg:hidden"
-      >
+      <label for="admin-drawer" class="btn btn-ghost btn-circle lg:hidden">
         <Menu class="w-5 h-5" />
       </label>
 
       <div class="hidden md:flex">
-        <input
-          type="text"
-          placeholder="Search..."
-          class="input input-bordered input-sm w-48"
-        />
+        <input type="text" placeholder="Search..." class="input input-bordered input-sm w-48" />
       </div>
     </div>
 
@@ -33,46 +21,13 @@
     <!-- Right -->
     <div class="flex items-center gap-3">
 
-      <!-- DARK MODE TOGGLE -->
-      <label class="toggle text-base-content">
-        <input
-          type="checkbox"
-          class="theme-controller"
-          :checked="isDark"
-          :disabled="!darkSupported"
-          @change="toggleDark"
-        />
-
-        <!-- Sun -->
-        <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2" />
-            <path d="M12 20v2" />
-            <path d="m4.93 4.93 1.41 1.41" />
-            <path d="m17.66 17.66 1.41 1.41" />
-            <path d="M2 12h2" />
-            <path d="M20 12h2" />
-            <path d="m6.34 17.66-1.41 1.41" />
-            <path d="m19.07 4.93-1.41 1.41" />
-          </g>
-        </svg>
-
-        <!-- Moon -->
-        <svg aria-label="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-          </g>
-        </svg>
-      </label>
-
       <!-- Notifications -->
       <div class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost btn-circle">
           <Bell class="w-5 h-5" />
         </label>
 
-        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box shadow w-64 mt-3">
+        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box shadow w-64 mt-3 z-[50]">
           <li class="menu-title"><span>Notifications</span></li>
           <li><a>New user registered</a></li>
           <li><a>System update available</a></li>
@@ -86,16 +41,15 @@
           <Palette class="w-5 h-5" />
         </label>
 
-        <ul
-          tabindex="0"
-          class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-56 max-h-72 overflow-y-auto"
-        >
-          <li v-for="theme in themes" :key="theme">
-            <button class="flex justify-between" @click="setTheme(theme)">
-              <span class="capitalize">{{ theme }}</span>
-              <span v-if="currentTheme === theme">✓</span>
-            </button>
-          </li>
+        <ul tabindex="0" class="dropdown-content z-[50] bg-base-100 rounded-box shadow w-100">
+          <div class="menu p-2 max-h-72 overflow-y-auto overscroll-contain">
+            <li v-for="theme in themes" :key="theme">
+              <button class="flex justify-between w-full" @click="setTheme(theme)">
+                <span class="capitalize">{{ theme }}</span>
+                <span v-if="currentTheme === theme">✓</span>
+              </button>
+            </li>
+          </div>
         </ul>
       </div>
 
@@ -107,7 +61,7 @@
           </div>
         </label>
 
-        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box shadow w-52 mt-3">
+        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box shadow w-52 mt-3 z-[50]">
           <li><a>Profile</a></li>
           <li><a>Settings</a></li>
           <li class="text-error"><a>Logout</a></li>
@@ -119,78 +73,64 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { Menu, Palette, Bell } from 'lucide-vue-next'
+import { ref, onMounted } from 'vue'
+import { ChevronLeft, Menu, Palette, Bell } from 'lucide-vue-next'
 
 defineEmits(['toggle-sidebar'])
 
-const themePairs = {
-  light: 'dark',
-  emerald: 'forest',
-  corporate: 'night',
-  retro: 'cyberpunk',
-  garden: 'halloween'
-}
-
-const reversePairs = Object.fromEntries(
-  Object.entries(themePairs).map(([k, v]) => [v, k])
-)
-
+/* ALL THEMES */
 const themes = [
   'light',
+  'dark',
   'cupcake',
   'bumblebee',
   'emerald',
   'corporate',
+  'synthwave',
   'retro',
-  'garden'
+  'cyberpunk',
+  'valentine',
+  'halloween',
+  'garden',
+  'forest',
+  'aqua',
+  'lofi',
+  'pastel',
+  'fantasy',
+  'wireframe',
+  'black',
+  'luxury',
+  'dracula',
+  'cmyk',
+  'autumn',
+  'business',
+  'acid',
+  'lemonade',
+  'night',
+  'coffee',
+  'winter',
+  'dim',
+  'nord',
+  'sunset'
 ]
 
 const currentTheme = ref('light')
-const baseTheme = ref('light')
 
-const isDark = computed(() =>
-  Object.values(themePairs).includes(currentTheme.value)
-)
-
-const darkSupported = computed(() =>
-  !!themePairs[baseTheme.value]
-)
-
+/* APPLY THEME */
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem('theme', theme)
   currentTheme.value = theme
 }
 
-function toggleDark() {
-  if (!darkSupported.value) return
-
-  const base = baseTheme.value
-
-  if (isDark.value) {
-    applyTheme(base)
-  } else {
-    applyTheme(themePairs[base])
-  }
-}
-
+/* USER SELECTS THEME */
 function setTheme(theme) {
-  baseTheme.value = theme
-
-  if (isDark.value && themePairs[theme]) {
-    applyTheme(themePairs[theme])
-  } else {
-    applyTheme(theme)
-  }
+  applyTheme(theme)
 }
 
+/* RESTORE SAVED THEME */
 onMounted(() => {
   const saved = localStorage.getItem('theme') || 'light'
-
-  currentTheme.value = saved
-  baseTheme.value = reversePairs[saved] || saved
-
   applyTheme(saved)
 })
 </script>
