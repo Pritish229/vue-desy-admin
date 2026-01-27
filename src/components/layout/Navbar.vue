@@ -3,16 +3,28 @@
 
     <!-- Left -->
     <div class="flex items-center gap-2">
-      <button class="btn btn-ghost btn-circle hidden lg:flex" @click="$emit('toggle-sidebar')">
-        <ChevronLeft class="w-5 h-5" />
+      <!-- Desktop Toggle -->
+      <button
+        class="btn btn-ghost btn-circle hidden lg:flex"
+        @click="$emit('toggle-sidebar')"
+      >
+        <Menu class="w-5 h-5" />
       </button>
 
-      <label for="admin-drawer" class="btn btn-ghost btn-circle lg:hidden">
+      <!-- Mobile Toggle (Drawer) -->
+      <label
+        for="admin-drawer"
+        class="btn btn-ghost btn-circle lg:hidden"
+      >
         <Menu class="w-5 h-5" />
       </label>
 
       <div class="hidden md:flex">
-        <input type="text" placeholder="Search..." class="input input-bordered input-sm w-48" />
+        <input
+          type="text"
+          placeholder="Search..."
+          class="input input-bordered input-sm w-48"
+        />
       </div>
     </div>
 
@@ -27,6 +39,7 @@
           type="checkbox"
           class="theme-controller"
           :checked="isDark"
+          :disabled="!darkSupported"
           @change="toggleDark"
         />
 
@@ -107,18 +120,16 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { ChevronLeft, Menu, Palette, Bell } from 'lucide-vue-next'
+import { Menu, Palette, Bell } from 'lucide-vue-next'
 
 defineEmits(['toggle-sidebar'])
 
 const themePairs = {
   light: 'dark',
-  cupcake: 'luxury',
   emerald: 'forest',
   corporate: 'night',
   retro: 'cyberpunk',
-  garden: 'halloween',
-  bumblebee: 'synthwave'
+  garden: 'halloween'
 }
 
 const reversePairs = Object.fromEntries(
@@ -142,33 +153,33 @@ const isDark = computed(() =>
   Object.values(themePairs).includes(currentTheme.value)
 )
 
-/* APPLY WITHOUT MUTATING BASE THEME */
+const darkSupported = computed(() =>
+  !!themePairs[baseTheme.value]
+)
+
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem('theme', theme)
   currentTheme.value = theme
 }
 
-/* TOGGLE ONLY SWITCHES VARIANT */
 function toggleDark() {
+  if (!darkSupported.value) return
+
   const base = baseTheme.value
 
   if (isDark.value) {
-    // go back to base light theme
     applyTheme(base)
   } else {
-    // go to paired dark theme
-    applyTheme(themePairs[base] || 'dark')
+    applyTheme(themePairs[base])
   }
 }
 
-/* USER PICKS A NEW BASE THEME */
 function setTheme(theme) {
   baseTheme.value = theme
 
-  // If currently dark, apply dark variant of new theme
-  if (isDark.value) {
-    applyTheme(themePairs[theme] || theme)
+  if (isDark.value && themePairs[theme]) {
+    applyTheme(themePairs[theme])
   } else {
     applyTheme(theme)
   }
@@ -177,11 +188,8 @@ function setTheme(theme) {
 onMounted(() => {
   const saved = localStorage.getItem('theme') || 'light'
 
-  // Restore both current + base theme properly
   currentTheme.value = saved
-  baseTheme.value =
-    reversePairs[saved] ||
-    saved
+  baseTheme.value = reversePairs[saved] || saved
 
   applyTheme(saved)
 })

@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import Dashboard from '@/views/Dashboard.vue'
-import UsersLayout from '@/views/users/UsersLayout.vue'
-import Students from '@/views/users/Students.vue'
-import Roles from '@/views/users/Roles.vue'
+import Alerts from '@/views/uicomponents/Alerts.vue'
+import Buttons from '@/views/uicomponents/Buttons.vue'
+import cards from '@/views/uicomponents/cards.vue'
 import Settings from '@/views/Settings.vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 
@@ -25,36 +25,45 @@ const routes = [
 
      
       {
-        path: 'users',
-        component: UsersLayout,
+        path: 'Components',
+        // component: Alerts,
         meta: {
-          breadcrumb: ['Home', 'Users'],
-          sidebar: 'Users',
-          icon: 'Users'
+          breadcrumb: ['Home', 'Components'],
+          sidebar: 'Components',
+          icon: 'AlignVerticalSpaceBetween'
         },
         children: [
           {
             path: '',
-            redirect: { name: 'students' }
+            redirect: { name: 'Components' }
           },
           // CHILD 1
           {
-            path: 'students',
-            name: 'students',
-            component: Students,
+            path: 'Alerts',
+            name: 'Alerts',
+            component: Alerts,
             meta: {
-              breadcrumb: ['Home', 'Users', 'Students'],
-              sidebar: 'Students'
+              breadcrumb: ['Home', 'Components', 'Alerts'],
+              sidebar: 'Alerts'
             }
           },
           // CHILD 2
           {
-            path: 'roles',
-            name: 'roles',
-            component: Roles,
+            path: 'Buttons',
+            name: 'Buttons',
+            component: Buttons,
             meta: {
-              breadcrumb: ['Home', 'Users', 'Roles'],
-              sidebar: 'Roles'
+              breadcrumb: ['Home', 'Components', 'Buttons'],
+              sidebar: 'Buttons'
+            }
+          },
+          {
+            path: 'cards',
+            name: 'cards',
+            component: cards,
+            meta: {
+              breadcrumb: ['Home', 'Components', 'cards'],
+              sidebar: 'cards'
             }
           }
         ]
