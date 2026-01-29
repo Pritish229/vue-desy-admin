@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  @apply bg-base-200 text-base-content;
+}
+
+.layout-shell {
+  @apply min-h-screen flex flex-col;
+}
+
+.page-container {
+  @apply max-w-7xl mx-auto w-full;
+}
+
+.card-grid {
+  @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
+}
+
+.perspective {
+  perspective: 1000px;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+.-rotate-x-6 {
+  transform: rotateX(-6deg);
+}
